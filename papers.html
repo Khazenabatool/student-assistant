@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow — Past Papers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #050810;
+  --deep: #0a0f1e;
+  --surface: #0f1628;
+  --glass: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-hover: rgba(255,255,255,0.07);
+  --aurora-1: #00f5c4;
+  --aurora-2: #7c3aed;
+  --aurora-3: #f59e0b;
+  --aurora-4: #ec4899;
+  --aurora-5: #3b82f6;
+  --text-primary: #f0f4ff;
+  --text-secondary: rgba(240,244,255,0.6);
+  --text-muted: rgba(240,244,255,0.35);
+  --page-accent: #06b6d4;
+  --page-accent-dim: rgba(6,182,212,0.12);
+  --font-display: 'Playfair Display','Georgia',serif;
+  --font-body: 'Plus Jakarta Sans','Helvetica Neue',sans-serif;
+  --nav-h: 70px;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --radius-pill: 100px;
+  --shadow-glass: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--night);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,58,237,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(6,182,212,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(59,130,246,0.08) 0%, transparent 70%),
+    var(--deep);
+  z-index: -2;
+  animation: bgShift 12s ease-in-out infinite alternate;
+}
+@keyframes bgShift {
+  100% {
+    background:
+      radial-gradient(ellipse 80% 60% at 80% 20%, rgba(124,58,237,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 20% 80%, rgba(6,182,212,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 60% 40%, rgba(236,72,153,0.08) 0%, transparent 70%),
+      var(--deep);
+  }
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 128px;
+  z-index: -1; pointer-events: none; opacity: 0.4;
+}
+
+/* NAV */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(5,8,16,0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 100;
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 8px;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.3rem; font-weight: 900;
+  color: var(--text-primary);
+  text-decoration: none; margin-right: 16px;
+  letter-spacing: -0.5px; white-space: nowrap;
+}
+.nav-logo span { color: var(--aurora-1); }
+.nav-links {
+  display: flex; align-items: center; gap: 2px;
+  flex: 1; overflow-x: auto; scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-link {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: var(--radius-pill);
+  text-decoration: none; font-size: 0.8rem; font-weight: 500;
+  color: var(--text-secondary); white-space: nowrap;
+  transition: all 0.2s ease; cursor: pointer;
+  background: none; border: none;
+}
+.nav-link:hover { color: var(--text-primary); background: var(--glass-hover); }
+.nav-link.active {
+  color: var(--page-accent);
+  background: var(--page-accent-dim);
+  border: 1px solid rgba(6,182,212,0.25);
+}
+
+/* PAGE */
+.page-wrap {
+  padding-top: calc(var(--nav-h) + 32px);
+  padding-bottom: 60px;
+  padding-left: 32px; padding-right: 32px;
+  max-width: 1200px; margin: 0 auto;
+}
+
+/* GLASS CARD */
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-glass);
+  padding: 28px; position: relative; overflow: hidden;
+}
+.glass-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+}
+
+/* TYPOGRAPHY */
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem,5vw,3.5rem);
+  font-weight: 900; line-height: 1.1; letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--page-accent) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 8px;
+}
+.page-subtitle { color: var(--text-secondary); font-size: 0.95rem; font-weight: 300; margin-bottom: 32px; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+  color: var(--text-primary); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* INPUTS */
+.sf-input {
+  width: 100%; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+  padding: 12px 16px; color: var(--text-primary);
+  font-family: var(--font-body); font-size: 0.9rem;
+  outline: none; transition: all 0.2s ease;
+}
+.sf-input::placeholder { color: var(--text-muted); }
+.sf-input:focus {
+  border-color: var(--page-accent);
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 0 3px var(--page-accent-dim);
+}
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 11px 22px; border-radius: var(--radius-pill);
+  border: none; font-family: var(--font-body); font-size: 0.88rem;
+  font-weight: 600; cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  letter-spacing: 0.2px; position: relative; overflow: hidden; white-space: nowrap;
+}
+.btn::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0); transition:background 0.2s; }
+.btn:hover::after { background:rgba(255,255,255,0.08); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--page-accent), #3b82f6);
+  color: var(--night); box-shadow: 0 4px 20px var(--page-accent-dim);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--page-accent-dim); }
+.btn-ghost {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); backdrop-filter: blur(8px);
+}
+.btn-ghost:hover { color: var(--text-primary); background: var(--glass-hover); }
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff; box-shadow: 0 4px 20px rgba(239,68,68,0.2);
+}
+.btn-danger:hover { transform: translateY(-2px); }
+.btn-sm { padding: 7px 16px; font-size: 0.8rem; }
+.btn-lg { padding: 15px 32px; font-size: 1rem; }
+.btn-active-filter {
+  background: rgba(6,182,212,0.15) !important;
+  border-color: rgba(6,182,212,0.4) !important;
+  color: var(--page-accent) !important;
+}
+
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: var(--radius-pill);
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.badge-green { background:rgba(0,245,196,0.15); color:var(--aurora-1); border:1px solid rgba(0,245,196,0.3); }
+.badge-amber { background:rgba(245,158,11,0.15); color:var(--aurora-3); border:1px solid rgba(245,158,11,0.3); }
+.badge-blue { background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+.badge-cyan { background:rgba(6,182,212,0.15); color:var(--page-accent); border:1px solid rgba(6,182,212,0.3); }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); z-index: 500;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #0f1628; border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg); padding: 36px;
+  width: 90%; max-width: 500px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+  animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+}
+.modal-box::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--page-accent),transparent);
+}
+@keyframes modalIn { from{transform:scale(0.85) translateY(20px);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-title { font-family:var(--font-display); font-size:1.4rem; font-weight:800; margin-bottom:16px; color:var(--text-primary); }
+.modal-actions { display:flex; gap:8px; margin-top:20px; justify-content:flex-end; }
+
+/* CONFETTI */
+.confetti-container { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999; }
+.confetti-piece { position:absolute;animation:confettiFall 3s ease-in forwards; }
+@keyframes confettiFall {
+  0%{transform:translateY(-20px) rotate(0deg) scale(1);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg) scale(0.5);opacity:0}
+}
+
+/* TOAST */
+.sf-toast {
+  position:fixed; bottom:28px; right:28px;
+  background:linear-gradient(135deg,#0f1628,#1a2040);
+  border:1px solid var(--page-accent); color:var(--text-primary);
+  padding:14px 22px; border-radius:var(--radius-pill);
+  font-size:0.88rem; font-weight:500; z-index:9999;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5),0 0 20px var(--page-accent-dim);
+  animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes toastIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes floatUp { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.anim-fade-up { animation:fadeUp 0.6s ease forwards; }
+.anim-fade-up-1 { animation:fadeUp 0.6s 0.1s ease both; }
+.anim-fade-up-2 { animation:fadeUp 0.6s 0.2s ease both; }
+.anim-fade-up-3 { animation:fadeUp 0.6s 0.3s ease both; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+
+/* GRID HELPERS */
+.flex { display:flex; }
+.items-center { align-items:center; }
+.justify-between { justify-content:space-between; }
+.gap-8 { gap:8px; }
+.gap-12 { gap:12px; }
+.flex-wrap { flex-wrap:wrap; }
+.mt-12 { margin-top:12px; }
+.mt-16 { margin-top:16px; }
+.mt-24 { margin-top:24px; }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+  .page-wrap { padding-left:16px; padding-right:16px; }
+}
+
+/* ============================================
+   PAPERS PAGE SPECIFIC
+   ============================================ */
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed rgba(6,182,212,0.3);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  background: rgba(6,182,212,0.03);
+  transition: all 0.25s;
+  cursor: pointer;
+  position: relative;
+}
+.upload-zone:hover { border-color:rgba(6,182,212,0.6); background:rgba(6,182,212,0.07); }
+.upload-zone.dragover { border-color:var(--page-accent); background:rgba(6,182,212,0.1); transform:scale(1.01); }
+.upload-icon { font-size:2.6rem; margin-bottom:10px; }
+.upload-label { font-weight:600; color:var(--text-primary); margin-bottom:5px; font-size:0.95rem; }
+.upload-sub { font-size:0.8rem; color:var(--text-muted); }
+.file-chosen-name {
+  margin-top:10px; font-size:0.82rem; color:var(--aurora-1);
+  display:flex; align-items:center; justify-content:center; gap:6px;
+}
+
+.upload-form {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;
+}
+
+/* Stats bar */
+.papers-stats { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+.ps-chip {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 20px; background:var(--glass);
+  border:1px solid var(--glass-border); border-radius:var(--radius-pill);
+  transition:transform 0.2s;
+}
+.ps-chip:hover { transform:translateY(-2px); }
+.ps-num { font-family:var(--font-display); font-size:1.5rem; font-weight:800; line-height:1; }
+.ps-lbl { font-size:0.78rem; color:var(--text-muted); }
+
+/* Paper grid */
+.paper-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:16px; margin-top:20px;
+}
+
+/* Paper card */
+.paper-card {
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  padding:22px;
+  position:relative;
+  transition:all 0.25s;
+  overflow:hidden;
+}
+.paper-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--page-accent), rgba(6,182,212,0.1));
+  transform:scaleX(0); transform-origin:left;
+  transition:transform 0.3s ease;
+}
+.paper-card:hover { transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 30px rgba(6,182,212,0.06); }
+.paper-card:hover::before { transform:scaleX(1); }
+.paper-card.is-solved { opacity:0.6; }
+.paper-card.is-solved::after {
+  content:'✓ SOLVED';
+  position:absolute; top:14px; right:14px;
+  font-size:0.62rem; font-weight:800; letter-spacing:1px;
+  padding:3px 10px; border-radius:20px;
+  background:rgba(0,245,196,0.15); color:var(--aurora-1);
+  border:1px solid rgba(0,245,196,0.3);
+}
+
+.paper-thumb {
+  width:46px; height:46px; border-radius:var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.7rem; margin-bottom:14px;
+  background:rgba(6,182,212,0.1);
+  border:1px solid rgba(6,182,212,0.2);
+  flex-shrink:0;
+}
+.paper-name { font-weight:700; font-size:0.95rem; margin-bottom:6px; line-height:1.4; }
+.paper-meta { font-size:0.78rem; color:var(--text-muted); margin-bottom:16px; line-height:1.8; }
+.paper-meta-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+.paper-actions { display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+
+/* Solved toggle */
+.solved-toggle {
+  display:flex; align-items:center; gap:6px;
+  font-size:0.78rem; color:var(--text-muted);
+  cursor:pointer; padding:6px 12px;
+  border-radius:var(--radius-pill);
+  border:1px solid var(--glass-border);
+  background:var(--glass);
+  transition:all 0.2s; user-select:none;
+}
+.solved-toggle:hover { border-color:rgba(0,245,196,0.4); color:var(--aurora-1); }
+.solved-toggle.active { border-color:rgba(0,245,196,0.4); color:var(--aurora-1); background:rgba(0,245,196,0.08); }
+
+/* Loading overlay */
+.loading-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 20px; background:var(--glass);
+  border:1px solid var(--glass-border); border-radius:var(--radius-pill);
+  font-size:0.85rem; color:var(--text-muted);
+  animation:fadeUp 0.3s ease;
+}
+.spin { animation:spinAnim 1s linear infinite; display:inline-block; }
+@keyframes spinAnim { to{transform:rotate(360deg)} }
+
+/* Progress bar for upload */
+.upload-progress {
+  height:4px; background:rgba(255,255,255,0.07);
+  border-radius:2px; margin-top:12px; overflow:hidden; display:none;
+}
+.upload-progress-fill {
+  height:100%; background:linear-gradient(90deg, var(--page-accent), #3b82f6);
+  border-radius:2px; transition:width 0.3s ease;
+  box-shadow:0 0 8px rgba(6,182,212,0.4);
+}
+
+@media(max-width:640px) {
+  .upload-form { grid-template-columns:1fr; }
+  .papers-stats { gap:10px; }
+}
+</style>
+</head>
+<body>
+<nav class="top-nav" id="main-nav"></nav>
+<div class="confetti-container" id="confetti-container"></div>
+
+<div class="page-wrap">
+
+  <div class="anim-fade-up">
+    <div class="page-title">Past Papers</div>
+    <p class="page-subtitle">Upload, organise, and track your past papers — all in one place.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="papers-stats anim-fade-up-1" id="papers-stats">
+    <div class="ps-chip">
+      <div class="ps-num" id="ps-total">0</div>
+      <div class="ps-lbl">Total Papers</div>
+    </div>
+    <div class="ps-chip">
+      <div class="ps-num" id="ps-solved" style="color:var(--aurora-1)">0</div>
+      <div class="ps-lbl">Solved ✓</div>
+    </div>
+    <div class="ps-chip">
+      <div class="ps-num" id="ps-remaining" style="color:var(--aurora-3)">0</div>
+      <div class="ps-lbl">Remaining</div>
+    </div>
+    <div class="ps-chip" id="ps-storage-chip" style="margin-left:auto">
+      <div class="ps-num" id="ps-storage" style="color:var(--page-accent);font-size:1rem">—</div>
+      <div class="ps-lbl">Storage used</div>
+    </div>
+  </div>
+
+  <!-- Add Paper -->
+  <div class="glass-card anim-fade-up-1" style="margin-bottom:24px">
+    <div class="section-title">📎 Add Paper to Library</div>
+
+    <div class="upload-form">
+      <input type="text" id="paper-name"    class="sf-input" placeholder="Paper title (e.g. 2023 Physics Paper 1)" autocomplete="off">
+      <input type="text" id="paper-subject" class="sf-input" placeholder="Subject (e.g. Physics)" autocomplete="off">
+      <input type="text" id="paper-year"    class="sf-input" placeholder="Year (e.g. 2023)" autocomplete="off">
+      <input type="text" id="paper-board"   class="sf-input" placeholder="Board (e.g. Cambridge, CBSE)" autocomplete="off">
+    </div>
+
+    <!-- Drop zone -->
+    <div class="upload-zone mt-16" id="upload-zone">
+      <div class="upload-icon">📂</div>
+      <div class="upload-label">Click or drag & drop a file here</div>
+      <div class="upload-sub">PDF, JPG, PNG · Files stored in your browser's IndexedDB (no size limit)</div>
+      <input type="file" id="paper-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
+      <div class="file-chosen-name" id="file-chosen" style="display:none">
+        <span>📎</span><span id="file-chosen-name-text"></span>
+        <button onclick="clearFile(event)" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.9rem;padding:0 4px" title="Remove file">✕</button>
+      </div>
+      <div class="upload-progress" id="upload-progress">
+        <div class="upload-progress-fill" id="upload-progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary mt-16" style="width:100%" id="add-paper-btn">
+      ➕ Add Paper to Library
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex gap-8 flex-wrap items-center anim-fade-up-2" style="margin-bottom:16px">
+    <span style="font-size:0.82rem;color:var(--text-muted)">Filter:</span>
+    <button class="btn btn-ghost btn-sm btn-active-filter" id="f-all"      onclick="setFilter('all')">All</button>
+    <button class="btn btn-ghost btn-sm"                   id="f-unsolved" onclick="setFilter('unsolved')">Unsolved</button>
+    <button class="btn btn-ghost btn-sm"                   id="f-solved"   onclick="setFilter('solved')">Solved ✓</button>
+    <input  type="text" class="sf-input" placeholder="🔍 Search papers…"
+            style="max-width:230px;margin-left:auto"
+            id="papers-search" oninput="setSearch(this.value)">
+  </div>
+
+  <!-- Grid -->
+  <div class="paper-grid anim-fade-up-3" id="papers-grid">
+    <div class="loading-pill"><span class="spin">⏳</span> Loading library…</div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+/* =============================================
+   NAV
+   ============================================= */
+var NAV_PAGES = [
+  {id:'dashboard', href:'index.html',      icon:'✦',  label:'Home'},
+  {id:'writing',   href:'writing.html',    icon:'✍️', label:'Writing'},
+  {id:'tracker',   href:'tracker.html',    icon:'📊', label:'Tracker'},
+  {id:'focus',     href:'focus.html',      icon:'🎯', label:'Focus'},
+  {id:'pomodoro',  href:'pomodoro.html',   icon:'🍅', label:'Pomodoro'},
+  {id:'papers',    href:'papers.html',     icon:'📄', label:'Papers'},
+  {id:'flashcards',href:'flashcards.html', icon:'🃏', label:'Flashcards'},
+  {id:'notes',     href:'notes.html',      icon:'📓', label:'Notes'},
+  {id:'todo',      href:'todo.html',       icon:'✅', label:'To-Do'},
+  {id:'calendar',  href:'calendar.html',   icon:'📅', label:'Calendar'},
+  {id:'motivation',href:'motivation.html', icon:'💫', label:'Motivation'},
+  {id:'vision',    href:'vision.html',     icon:'🌟', label:'Vision'},
+];
+
+function buildNav(activeId) {
+  var nav = document.getElementById('main-nav');
+  nav.innerHTML =
+    '<a href="index.html" class="nav-logo">Study<span>Flow</span></a>' +
+    '<div class="nav-links">' +
+    NAV_PAGES.map(function(p) {
+      return '<a href="' + p.href + '" class="nav-link ' + (p.id === activeId ? 'active' : '') + '">' +
+             '<span class="nl-icon">' + p.icon + '</span>' + p.label + '</a>';
+    }).join('') +
+    '</div>';
+}
+
+buildNav('papers');
+
+/* =============================================
+   LS — metadata only (no file blobs)
+   ============================================= */
+var LS = {
+  get: function(k, d) { try { var v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : d; } catch(e) { return d; } },
+  set: function(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+};
+
+/* =============================================
+   INDEXEDDB — stores actual file blobs
+   ============================================= */
+var DB_NAME   = 'StudyFlowPapers';
+var DB_VER    = 1;
+var STORE     = 'files';
+var db        = null;
+
+function openDB() {
+  return new Promise(function(resolve, reject) {
+    if (db) { resolve(db); return; }
+    var req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = function(e) {
+      var d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        d.createObjectStore(STORE, {keyPath: 'id'});
+      }
+    };
+    req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+    req.onerror   = function(e) { reject(e); };
+  });
+}
+
+function dbSaveFile(id, blob, mimeType) {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      var tx  = d.transaction(STORE, 'readwrite');
+      var st  = tx.objectStore(STORE);
+      var req = st.put({id: id, blob: blob, mimeType: mimeType});
+      req.onsuccess = resolve;
+      req.onerror   = reject;
+    });
+  });
+}
+
+function dbGetFile(id) {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      var tx  = d.transaction(STORE, 'readonly');
+      var st  = tx.objectStore(STORE);
+      var req = st.get(id);
+      req.onsuccess = function(e) { resolve(e.target.result || null); };
+      req.onerror   = reject;
+    });
+  });
+}
+
+function dbDeleteFile(id) {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      var tx  = d.transaction(STORE, 'readwrite');
+      var st  = tx.objectStore(STORE);
+      var req = st.delete(id);
+      req.onsuccess = resolve;
+      req.onerror   = reject;
+    });
+  });
+}
+
+function dbGetAllKeys() {
+  return openDB().then(function(d) {
+    return new Promise(function(resolve, reject) {
+      var tx  = d.transaction(STORE, 'readonly');
+      var st  = tx.objectStore(STORE);
+      var req = st.getAll();
+      req.onsuccess = function(e) { resolve(e.target.result || []); };
+      req.onerror   = reject;
+    });
+  });
+}
+
+/* =============================================
+   UTILITIES
+   ============================================= */
+function showToast(msg, dur) {
+  dur = dur || 2800;
+  var t = document.createElement('div');
+  t.className = 'sf-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() {
+    t.style.animation = 'toastIn 0.4s reverse forwards';
+    setTimeout(function() { t.remove(); }, 400);
+  }, dur);
+}
+
+function showModal(title, bodyHtml, actions) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  var actEl = document.getElementById('modal-actions');
+  actEl.innerHTML = '';
+  (actions || []).forEach(function(a) {
+    var btn = document.createElement('button');
+    btn.className = 'btn ' + a.cls;
+    btn.textContent = a.label;
+    btn.addEventListener('click', a.action);
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function confetti() {
+  var c = document.getElementById('confetti-container');
+  var colors = ['#00f5c4','#7c3aed','#f59e0b','#ec4899','#3b82f6','#06b6d4','#ffffff'];
+  for (var i = 0; i < 80; i++) {
+    var p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left   = (Math.random()*100) + 'vw';
+    p.style.top    = '-10px';
+    p.style.background     = colors[Math.floor(Math.random()*colors.length)];
+    p.style.width  = p.style.height = (5 + Math.random()*9) + 'px';
+    p.style.borderRadius   = Math.random() > 0.5 ? '50%' : '3px';
+    p.style.animationDuration = (2 + Math.random()*2) + 's';
+    p.style.animationDelay    = (Math.random()*0.8) + 's';
+    c.appendChild(p);
+    setTimeout(function() { p.remove(); }, 4000);
+  }
+}
+
+function fmtBytes(bytes) {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+/* =============================================
+   FILE INPUT / DRAG-DROP
+   ============================================= */
+var chosenFile = null;
+
+var zone  = document.getElementById('upload-zone');
+var input = document.getElementById('paper-file');
+
+zone.addEventListener('click', function() { input.click(); });
+
+input.addEventListener('change', function() {
+  if (this.files && this.files[0]) pickFile(this.files[0]);
+});
+
+zone.addEventListener('dragover', function(e) {
+  e.preventDefault(); zone.classList.add('dragover');
+});
+zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
+zone.addEventListener('drop', function(e) {
+  e.preventDefault(); zone.classList.remove('dragover');
+  var f = e.dataTransfer.files[0];
+  if (f) pickFile(f);
+});
+
+function pickFile(file) {
+  var allowed = ['application/pdf','image/jpeg','image/png','image/jpg'];
+  if (allowed.indexOf(file.type) === -1 && file.name.match(/\.(pdf|jpg|jpeg|png)$/i) === null) {
+    showToast('Only PDF, JPG, or PNG files are supported.');
+    return;
+  }
+  chosenFile = file;
+  var nameEl = document.getElementById('file-chosen-name-text');
+  nameEl.textContent = file.name + ' (' + fmtBytes(file.size) + ')';
+  document.getElementById('file-chosen').style.display = 'flex';
+}
+
+function clearFile(e) {
+  e.stopPropagation();
+  chosenFile = null;
+  input.value = '';
+  document.getElementById('file-chosen').style.display = 'none';
+  document.getElementById('file-chosen-name-text').textContent = '';
+}
+
+/* =============================================
+   ADD PAPER
+   ============================================= */
+document.getElementById('add-paper-btn').addEventListener('click', addPaper);
+
+function addPaper() {
+  var name    = document.getElementById('paper-name').value.trim();
+  var subject = document.getElementById('paper-subject').value.trim();
+  var year    = document.getElementById('paper-year').value.trim();
+  var board   = document.getElementById('paper-board').value.trim();
+
+  if (!name) { showToast('⚠️ Please enter a paper title!'); return; }
+
+  var btn = document.getElementById('add-paper-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> Saving…';
+
+  var paperId = Date.now();
+  var paper = {
+    id: paperId,
+    name: name,
+    subject: subject,
+    year: year,
+    board: board,
+    solved: false,
+    hasFile: false,
+    fileType: null,
+    fileName: null,
+    fileSize: 0,
+    date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})
+  };
+
+  function finalize() {
+    var papers = LS.get('papers', []);
+    papers.unshift(paper);
+    LS.set('papers', papers);
+
+    // Reset form
+    ['paper-name','paper-subject','paper-year','paper-board'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    clearFile({stopPropagation: function(){}});
+
+    btn.disabled = false;
+    btn.innerHTML = '➕ Add Paper to Library';
+
+    render();
+    updateStorageInfo();
+    showToast('✅ Paper added to library!');
+  }
+
+  if (chosenFile) {
+    paper.hasFile  = true;
+    paper.fileType = chosenFile.type || (chosenFile.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+    paper.fileName = chosenFile.name;
+    paper.fileSize = chosenFile.size;
+
+    // Show progress bar
+    var prog = document.getElementById('upload-progress');
+    var fill = document.getElementById('upload-progress-fill');
+    prog.style.display = 'block';
+    fill.style.width = '30%';
+
+    dbSaveFile(paperId, chosenFile, paper.fileType).then(function() {
+      fill.style.width = '100%';
+      setTimeout(function() {
+        prog.style.display = 'none';
+        fill.style.width = '0%';
+        finalize();
+      }, 300);
+    }).catch(function(err) {
+      console.error('IndexedDB save error:', err);
+      btn.disabled = false;
+      btn.innerHTML = '➕ Add Paper to Library';
+      prog.style.display = 'none';
+      showToast('❌ Failed to save file. Try a smaller file or different browser.');
+    });
+  } else {
+    finalize();
+  }
+}
+
+/* =============================================
+   FILTER / SEARCH
+   ============================================= */
+var filterMode = 'all';
+var searchQ    = '';
+
+function setFilter(mode) {
+  filterMode = mode;
+  ['all','unsolved','solved'].forEach(function(m) {
+    var el = document.getElementById('f-' + m);
+    if (m === mode) el.classList.add('btn-active-filter');
+    else             el.classList.remove('btn-active-filter');
+  });
+  render();
+}
+
+function setSearch(q) {
+  searchQ = q.toLowerCase();
+  render();
+}
+
+/* =============================================
+   TOGGLE SOLVED
+   ============================================= */
+function toggleSolved(id) {
+  var papers = LS.get('papers', []);
+  var p = papers.find(function(x) { return x.id === id; });
+  if (!p) return;
+  p.solved = !p.solved;
+  LS.set('papers', papers);
+  if (p.solved) confetti();
+  render();
+}
+
+/* =============================================
+   DELETE PAPER
+   ============================================= */
+function deletePaper(id) {
+  showModal('Delete Paper',
+    '<p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">Are you sure you want to delete this paper? The file will also be removed from storage.</p>',
+    [
+      {label: 'Cancel', cls: 'btn-ghost', action: closeModal},
+      {label: '🗑 Delete', cls: 'btn-danger', action: function() {
+        var papers = LS.get('papers', []).filter(function(x) { return x.id !== id; });
+        LS.set('papers', papers);
+        dbDeleteFile(id).catch(function() {});
+        closeModal();
+        render();
+        updateStorageInfo();
+        showToast('Paper deleted.');
+      }}
+    ]
+  );
+}
+
+/* =============================================
+   VIEW FILE
+   ============================================= */
+function viewFile(id) {
+  dbGetFile(id).then(function(record) {
+    if (!record || !record.blob) { showToast('⚠️ No file found. It may have been cleared.'); return; }
+    var url = URL.createObjectURL(record.blob);
+    var win = window.open();
+    if (!win) { showToast('⚠️ Pop-up blocked — please allow pop-ups.'); URL.revokeObjectURL(url); return; }
+    if (record.mimeType === 'application/pdf') {
+      win.document.write('<iframe src="' + url + '" style="width:100%;height:100vh;border:none;background:#1a1a2e"></iframe>');
+    } else {
+      win.document.write('<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + url + '" style="max-width:100%;max-height:100vh;object-fit:contain"></body>');
+    }
+    setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+  }).catch(function() {
+    showToast('❌ Could not load file.');
+  });
+}
+
+/* =============================================
+   STORAGE INFO
+   ============================================= */
+function updateStorageInfo() {
+  dbGetAllKeys().then(function(records) {
+    var total = records.reduce(function(a, r) { return a + (r.blob ? r.blob.size : 0); }, 0);
+    document.getElementById('ps-storage').textContent = fmtBytes(total);
+  }).catch(function() {});
+}
+
+/* =============================================
+   RENDER
+   ============================================= */
+function render() {
+  var allPapers = LS.get('papers', []);
+  var papers = allPapers.slice();
+
+  if (filterMode === 'solved')   papers = papers.filter(function(p) { return p.solved; });
+  if (filterMode === 'unsolved') papers = papers.filter(function(p) { return !p.solved; });
+  if (searchQ) papers = papers.filter(function(p) {
+    return (p.name + ' ' + p.subject + ' ' + p.year + ' ' + p.board).toLowerCase().indexOf(searchQ) !== -1;
+  });
+
+  // Stats
+  var totalCount  = allPapers.length;
+  var solvedCount = allPapers.filter(function(p) { return p.solved; }).length;
+  document.getElementById('ps-total').textContent     = totalCount;
+  document.getElementById('ps-solved').textContent    = solvedCount;
+  document.getElementById('ps-remaining').textContent = totalCount - solvedCount;
+
+  var grid = document.getElementById('papers-grid');
+
+  if (!papers.length) {
+    var msg = allPapers.length === 0
+      ? '📄 No papers yet — add your first one above!'
+      : '🔍 No papers match your current filter.';
+    grid.innerHTML =
+      '<div class="glass-card" style="grid-column:1/-1;text-align:center;padding:60px 40px;color:var(--text-muted)">' +
+      '<div style="font-size:3rem;margin-bottom:14px">📄</div>' +
+      '<div style="font-size:0.95rem">' + msg + '</div></div>';
+    return;
+  }
+
+  grid.innerHTML = papers.map(function(p) {
+    var thumb = p.hasFile ? (p.fileType && p.fileType.includes('image') ? '🖼️' : '📄') : '📋';
+    var tagsHtml = '';
+    if (p.subject) tagsHtml += '<span class="badge badge-cyan">' + escHtml(p.subject) + '</span>';
+    if (p.year)    tagsHtml += '<span class="badge badge-amber">' + escHtml(p.year) + '</span>';
+
+    var metaLines = [];
+    if (p.board)    metaLines.push('📋 ' + escHtml(p.board));
+    if (p.fileName) metaLines.push('📎 ' + escHtml(p.fileName) + (p.fileSize ? ' · ' + fmtBytes(p.fileSize) : ''));
+    metaLines.push('Added ' + escHtml(p.date));
+
+    return '<div class="paper-card ' + (p.solved ? 'is-solved' : '') + '" id="pc-' + p.id + '">' +
+      '<div style="display:flex;gap:14px;align-items:flex-start">' +
+        '<div class="paper-thumb">' + thumb + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="paper-name">' + escHtml(p.name) + '</div>' +
+          (tagsHtml ? '<div class="paper-meta-tags">' + tagsHtml + '</div>' : '') +
+          '<div class="paper-meta">' + metaLines.join('<br>') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="paper-actions">' +
+        (p.hasFile ? '<button class="btn btn-primary btn-sm" data-view="' + p.id + '">👁 View</button>' : '') +
+        '<button class="' + (p.solved ? 'solved-toggle active' : 'solved-toggle') + '" data-toggle="' + p.id + '">' +
+          (p.solved ? '✓ Solved' : '○ Mark Solved') +
+        '</button>' +
+        '<button class="btn btn-ghost btn-sm" data-delete="' + p.id + '" style="margin-left:auto;color:#f87171;border-color:rgba(239,68,68,0.25)">🗑</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* =============================================
+   DELEGATED EVENTS ON GRID
+   ============================================= */
+document.getElementById('papers-grid').addEventListener('click', function(e) {
+  var viewBtn   = e.target.closest('[data-view]');
+  var toggleBtn = e.target.closest('[data-toggle]');
+  var deleteBtn = e.target.closest('[data-delete]');
+
+  if (viewBtn)   viewFile(parseInt(viewBtn.getAttribute('data-view')));
+  if (toggleBtn) toggleSolved(parseInt(toggleBtn.getAttribute('data-toggle')));
+  if (deleteBtn) deletePaper(parseInt(deleteBtn.getAttribute('data-delete')));
+});
+
+/* =============================================
+   INIT
+   ============================================= */
+openDB().then(function() {
+  render();
+  updateStorageInfo();
+}).catch(function() {
+  render(); // fallback even if IndexedDB fails
+});
+</script>
+</body>
+</html>
